@@ -1,0 +1,78 @@
+[
+  {
+    "response": "{\n    \"decision\": 50,\n    \"reasoning\": \"As a policeman, I believe in upholding the law and being fair, so I will split the money evenly to reflect a sense of justice and morality, even though the other player has no say in the division.\",\n    \"kept_amount\": 50,\n    \"given_amount\": 50,\n    \"confidence\": 9\n}",
+    "timestamp": "2025-06-17T17:50:33.529262",
+    "extracted_numbers": [
+      50,
+      50,
+      50,
+      9
+    ],
+    "decision": 50,
+    "reasoning": "As a policeman, I believe in upholding the law and being fair, so I will split the money evenly to reflect a sense of justice and morality, even though the other player has no say in the division.",
+    "kept_amount": 50,
+    "given_amount": 50,
+    "confidence": 9,
+    "iteration": 1,
+    "model": "meta-llama/llama-3.3-8b-instruct:free",
+    "temperature": 0.3,
+    "sum": 100
+  },
+  {
+    "response": "{\n    \"decision\": 50,\n    \"reasoning\": \"As a policeman, I believe in upholding the law and being fair, so I will split the money evenly to reflect a sense of justice and morality, despite the other player having no say in the division.\",\n    \"kept_amount\": 50,\n    \"given_amount\": 50,\n    \"confidence\": 9\n}",
+    "timestamp": "2025-06-17T17:50:35.155609",
+    "extracted_numbers": [
+      50,
+      50,
+      50,
+      9
+    ],
+    "decision": 50,
+    "reasoning": "As a policeman, I believe in upholding the law and being fair, so I will split the money evenly to reflect a sense of justice and morality, despite the other player having no say in the division.",
+    "kept_amount": 50,
+    "given_amount": 50,
+    "confidence": 9,
+    "iteration": 2,
+    "model": "meta-llama/llama-3.3-8b-instruct:free",
+    "temperature": 0.3,
+    "sum": 100
+  },
+  {
+    "response": "{\n    \"decision\": 50,\n    \"reasoning\": \"As a policeman, I believe in upholding the law and being fair, so I will split the money evenly to reflect a sense of justice and morality\",\n    \"kept_amount\": 50,\n    \"given_amount\": 50,\n    \"confidence\": 9\n}",
+    "timestamp": "2025-06-17T17:50:36.547071",
+    "extracted_numbers": [
+      50,
+      50,
+      50,
+      9
+    ],
+    "decision": 50,
+    "reasoning": "As a policeman, I believe in upholding the law and being fair, so I will split the money evenly to reflect a sense of justice and morality",
+    "kept_amount": 50,
+    "given_amount": 50,
+    "confidence": 9,
+    "iteration": 3,
+    "model": "meta-llama/llama-3.3-8b-instruct:free",
+    "temperature": 0.3,
+    "sum": 100
+  },
+  {
+    "response": "{\n    \"decision\": 50,\n    \"reasoning\": \"As a policeman, I believe in upholding the law and being fair, so I will split the money evenly to reflect a sense of justice and morality, despite the other player having no say in the division.\",\n    \"kept_amount\": 50,\n    \"given_amount\": 50,\n    \"confidence\": 9\n}",
+    "timestamp": "2025-06-17T17:50:37.851308",
+    "extracted_numbers": [
+      50,
+      50,
+      50,
+      9
+    ],
+    "decision": 50,
+    "reasoning": "As a policeman, I believe in upholding the law and being fair, so I will split the money evenly to reflect a sense of justice and morality, despite the other player having no say in the division.",
+    "kept_amount": 50,
+    "given_amount": 50,
+    "confidence": 9,
+    "iteration": 4,
+    "model": "meta-llama/llama-3.3-8b-instruct:free",
+    "temperature": 0.3,
+    "sum": 100
+  }
+]
