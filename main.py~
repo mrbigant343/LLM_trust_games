@@ -15,7 +15,7 @@ def run_trust_game_experiment(excel_path: str, output_dir: str):
     
     Args:
         excel_path: Path to the Excel configuration file
-        output_dir: D irectory to save results
+        output_dir: Directory to save results
     """
     try:
         # Create output directory if it doesn't exist
