@@ -160,7 +160,7 @@ def run_trust_game_experiment(excel_path: str, output_dir: str):
 if __name__ == '__main__':
     
     # Run the trust game experiment
-    excel_file = "config_eng.xlsx"
+    excel_file = "config.xlsx"
     output_directory = "results"
     
     if os.path.exists(excel_file):
