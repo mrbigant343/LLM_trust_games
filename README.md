@@ -30,7 +30,7 @@ LLM_trust_games/
 
 1. **Clone the repository**:
    ```bash
-   git clone mrbigant343/LLM_trust_games
+   git clone https://github.com/mrbigant343/LLM_trust_games.git
    cd LLM_trust_games
    ```
 
