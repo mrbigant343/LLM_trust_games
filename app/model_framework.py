@@ -13,7 +13,6 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import Union, Optional, List, Dict, Any
 import logging
-import re
 
 load_dotenv()
 
@@ -282,24 +281,22 @@ class LLMClientConfig:
             "timestamp": datetime.now().isoformat()
         }
         
-        # Try to extract numeric values
-        numbers = re.findall(r'\b\d+\b', output)
-        if numbers:
-            result["extracted_numbers"] = [int(n) for n in numbers]
-            result["decision"] = int(numbers[0]) if numbers else None
-        
         # Try to parse as JSON
         cleaned_output = output.strip('````pythonjson\n "')
-        
+        s = cleaned_output.find('{')
+        e = cleaned_output.rfind('}')
+        if  s != -1 and e != -1:
+            cleaned_output = cleaned_output[s:e+1]
         # Step 2: Try parsing from direct JSON fragment (best case)
-        if cleaned_output.startswith('{') and cleaned_output.endswith('}'):
-            try:
-                parsed_json = json.loads(cleaned_output)
-                result.update(parsed_json)
-            except json.JSONDecodeError:
-                return result
-                raise "Response for model {self.model} looks like JSON but failed to parse"
-    
+        #if cleaned_output.startswith('{') and cleaned_output.endswith('}'):
+        try:
+            parsed_json = json.loads(cleaned_output)
+            result.update(parsed_json)
+            logger.debug(f"Successfully parsed JSON for model {self.model}")
+        except json.JSONDecodeError as e:
+            logger.warning(f"JSON parsing failed for model {self.model}. Response: {output[:100]}...")
+            # Re-raise the JSONDecodeError so it can be caught by retry mechanism
+            raise json.JSONDecodeError
         return result
     
     def check_and_run_model(self):
@@ -308,32 +305,6 @@ class LLMClientConfig:
         elif "yandexgpt" in self.model.lower():
             return self._run_yandexgpt()
         return self._run_openrouter()
-
-    def run_model(self, client: OpenAI) -> List[Dict[str, Any]]:
-        '''Run OpenRouter model with retries and response saving'''
-        results = []
-        
-        for i in range(self.n_requests):
-            try:
-                # Generate prompt with substitutions
-                response_text = self.check_and_run_model(self.prompt)
-                result = self.parse_json(response_text)
-                results.append(result)
-                    
-                # Save intermediate results
-                if self.save and (i + 1) % self.save == 0:
-                    self.save_json(f"intermediate_results_{self.model}_{i+1}.json", results)
-                
-            except Exception as e:
-                logger.error(f"Error in request {i+1} for {self.model}: {e}")
-                results.append({
-                    "iteration": i + 1,
-                    "error": str(e),
-                    "model": self.model,
-                    "timestamp": datetime.now().isoformat()
-                })
-        return results
-            
 
     def save_json(self, filename: str, data: List[Dict[str, Any]] = None) -> None:
         try:
@@ -376,6 +347,7 @@ class LLMClientConfig:
         '''
         Internal method for detecting model run errors.
         '''
+        
         error_msg = str(error)
         if "rate limit" in error_msg.lower():
             return "rate_limit"
@@ -383,6 +355,8 @@ class LLMClientConfig:
             return "timeout"
         elif "authentication" in error_msg.lower():
             return "auth_error"
+        elif "JSON" in error_msg.lower():
+            return "parsing_error"
         else:
             return "unknown_error"
 

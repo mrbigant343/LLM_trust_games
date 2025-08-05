@@ -90,13 +90,12 @@ def run_trust_game_experiment(excel_path: str, output_dir: str):
                     
                     try:
                         # Generate prompt for this iteration
-                        #logger.info(f"Processing request {i+1}/{config.n_requests} for {config.model}")
-                        def _call_model():
-                            return config.check_and_run_model()
+                        def _model_call_with_parsing():
+                            response_text = config.check_and_run_model()
+                            return config.parse_json(response_text)
 
                         # Call model and parse response with retry
-                        response_text = config._retry_on_failure(_call_model)
-                        result = config.parse_json(response_text)
+                        result = config._retry_on_failure(_model_call_with_parsing)
                         
                         # Add to results
                         config_results.append(result)
@@ -106,7 +105,6 @@ def run_trust_game_experiment(excel_path: str, output_dir: str):
                         if config.save and (i + 1) % config.save == 0:
                             # Save config-specific files
                             config.save_json(os.path.join(output_dir, f"{key}.json"), config_results)
-                            #pd.DataFrame(config_results).to_excel(os.path.join(output_dir, f"{config.id}_{config.model}_{i+1}.xlsx"), index=False)
                             
                             # Save merged files
                             pd.DataFrame(merged_json).to_excel(os.path.join(output_dir, "all_results.xlsx"), index=False)
