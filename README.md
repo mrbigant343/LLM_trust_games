@@ -37,7 +37,7 @@ LLM_trust_games/
 2. **Set up Python environment**:
    ```bash
    python -m venv trust_game_env
-   source trust_game_env/bin/activate  # On Windows: trust_game_env\Scripts\activate
+   trust_game_env\Scripts\activate  #On Linux:  source trust_game_env/bin/activate
    pip install -r requirements.txt
    ```
 
