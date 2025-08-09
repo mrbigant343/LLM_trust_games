@@ -42,7 +42,7 @@ LLM_trust_games/
    ```
 
 3. **Configure API keys**:
-   Create a `.env` file with your API keys:
+   Create a `.env` file with your API keys (or You can use ".env_structure" example):
    ```bash
    # OpenRouter API (required for most models)
    OPENROUTER_API_KEY=your_openrouter_api_key
@@ -80,7 +80,21 @@ Edit `app/models.txt` to specify which models to use:
 openai/o4-mini
 #anthropic/claude-sonnet-4
 ```
-
+### How to add new JSON keys?
+You can change different JSON keys in system prompt.
+1. Open app/model_framework.py and find 43-48 strings.
+2. Change JSON scheme as follow:
+```
+{
+"key": <KEY_DESCRIPTION_as_TYPE>
+}
+```
+For example you want to generate favorite model color:
+```
+{
+"color": "<your_favorite_color_as_str>"
+}
+```
 ## Usage
 
 Run the trust game experiment:
@@ -92,6 +106,7 @@ Results will be saved to the `results/` directory:
 - Individual model results as JSON and Excel files
 - Merged results from all experiments
 - Checkpoint files for resuming interrupted experiments
+- Delete or clean directory for new config file
 
 ## Experiment Process
 
