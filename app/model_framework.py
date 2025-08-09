@@ -47,6 +47,7 @@ def _generate_single_prompt(prompt) -> str:
         }
         IMPORTANT: Respond ONLY with valid JSON. Do not include any other text before or after the JSON.
         """.strip()
+        #json_instruction = ''
         full_prompt = f"{prompt}\n\n{json_instruction}"
         
         return full_prompt
@@ -125,6 +126,8 @@ class LLMClientConfig:
     temp: float = 0.7                   # Default value is 0.7
     save: Optional[int] = None          # Save step (optional)
     comment: Optional[str] = None       # Researcher comment
+    success = 0
+    error = 0
 
     def init_openrouter(self) -> OpenAI:
         '''
@@ -142,6 +145,7 @@ class LLMClientConfig:
             return client
         except Exception as e:
             logger.error(f"Failed to initialize OpenRouter: {e}")
+            self.error += 1
             raise
     
     def _run_openrouter(self):
@@ -179,6 +183,7 @@ class LLMClientConfig:
             return client
         except Exception as e:
             logger.error(f"Failed to initialize Gigachat: {e}")
+            self.error += 1
             raise
 
     def _run_gigachat(self) -> str:
@@ -221,6 +226,7 @@ class LLMClientConfig:
             return client
         except Exception as e:
             logger.error(f"Failed to initialize YandexGPT: {e}")
+            self.error += 1
             raise
     
     def _run_yandexgpt(self):
@@ -282,19 +288,20 @@ class LLMClientConfig:
         }
         
         # Try to parse as JSON
-        cleaned_output = output.strip('````pythonjson\n "')
+        cleaned_output = output.strip('````pythonjson\n "')#.replace('\n', ' ')
         s = cleaned_output.find('{')
         e = cleaned_output.rfind('}')
         if  s != -1 and e != -1:
             cleaned_output = cleaned_output[s:e+1]
         # Step 2: Try parsing from direct JSON fragment (best case)
-        #if cleaned_output.startswith('{') and cleaned_output.endswith('}'):
         try:
             parsed_json = json.loads(cleaned_output)
             result.update(parsed_json)
             logger.debug(f"Successfully parsed JSON for model {self.model}")
+            self.success += 1
         except json.JSONDecodeError as e:
             logger.warning(f"JSON parsing failed for model {self.model}. Response: {output[:100]}...")
+            self.error += 1
             # Re-raise the JSONDecodeError so it can be caught by retry mechanism
             raise json.JSONDecodeError
         return result
@@ -341,6 +348,27 @@ class LLMClientConfig:
         except Exception as e:
             logger.error(f"Error saving Excel file: {e}")
 
+    def save_error_report(self, filename:str = 'error_report.xlsx') -> None:
+        '''
+        Saves a complete .xlsx file with all iteration error report.
+        '''
+        try:
+            if not os.path.exists(filename):
+                pd.DataFrame(columns=['model', 'success', 'error', 'all']).to_excel(filename, index=False)
+            df_report = pd.read_excel(filename)
+            if self.model not in df_report['model'].to_list():
+                temp =  pd.DataFrame([[self.model, self.success, self.error, self.success + self.error]], columns=['model', 'success', 'error', 'all'])
+                df_report = pd.concat([df_report, temp])
+            else:
+                mask = df_report['model'] == self.model     
+                df_report.loc[mask, 'success'] = df_report.loc[mask, 'success'].apply(lambda x: x + self.success)
+                df_report.loc[mask, 'error'] = df_report.loc[mask, 'error'].apply(lambda x: x + self.error)
+                df_report.loc[mask, 'all'] = df_report.loc[mask, 'all'].apply(lambda x: x + self.success + self.error)
+            df_report.to_excel(filename, index=False)
+            logger.info(f"Saved Excel results to: {filename}")
+        except Exception as e:
+            logger.error(f"Error saving Error Report file: {e}")
+
 
     @staticmethod
     def _handle_api_error(error: Exception) -> str:
@@ -371,7 +399,7 @@ class LLMClientConfig:
                 return func()
             except Exception as e:
                 error_type = LLMClientConfig._handle_api_error(e)
-                wait_time = 2 ** attempt  # Exponential backoff
+                wait_time = 2 * attempt
                 
                 if attempt == max_retries - 1:
                     logger.error(f"All {max_retries} attempts failed. Last error: {e}")

@@ -15,7 +15,7 @@ def run_trust_game_experiment(excel_path: str, output_dir: str):
     
     Args:
         excel_path: Path to the Excel configuration file
-        output_dir: D irectory to save results
+        output_dir: Directory to save results
     """
     try:
         # Create output directory if it doesn't exist
@@ -24,6 +24,7 @@ def run_trust_game_experiment(excel_path: str, output_dir: str):
         # Initialize paths and data structures
         checkpoint_path = os.path.join(output_dir, "checkpoints.json")
         merged_json_path = os.path.join(output_dir, "all_results.json")
+        error_report_path = os.path.join(output_dir, "error_report.xlsx")
         merged_json = []
         
         # Load or initialize checkpoints
@@ -116,22 +117,24 @@ def run_trust_game_experiment(excel_path: str, output_dir: str):
                         # Update checkpoint
                         checkpoints[key] = 1
                         
+                        
                     except Exception as e:
                         logger.error(f"Error processing {key}: {e}")
                         checkpoints[key] = 0  # Mark as failed
-                        result = {
-                            "iteration": i+1,
-                            "error": str(e),
-                            "model": config.model,
-                            "timestamp": datetime.now().isoformat(),
-                            "id": config.id
-                        }
-                        config_results.append(result)
-                        merged_json.append(result)
+                        #result = {
+                            #"iteration": i+1,
+                            #"error": str(e),
+                            #"model": config.model,
+                            #"timestamp": datetime.now().isoformat(),
+                            #"id": config.id
+                        #}
+                        #config_results.append(result)
+                        #merged_json.append(result)
                     
                     # Save current state periodically
                     with open(checkpoint_path, 'w', encoding='utf-8') as f:
                         json.dump(checkpoints, f, indent=2)
+                        config.save_error_report(filename=error_report_path)
                 
                 if processed:
                     # Save final config results
