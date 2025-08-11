@@ -288,7 +288,7 @@ class LLMClientConfig:
         }
         
         # Try to parse as JSON
-        cleaned_output = output.strip('````pythonjson\n "')#.replace('\n', ' ')
+        cleaned_output = output.strip('````pythonjson\n "').replace('\n', ' ')
         s = cleaned_output.find('{')
         e = cleaned_output.rfind('}')
         if  s != -1 and e != -1:
